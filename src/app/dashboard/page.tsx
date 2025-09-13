@@ -10,7 +10,7 @@ export default function Dashboard() {
   const router = useRouter();
   const { user, isLoading, signOut } = useAuth();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[] | null>(null);
+  const [results, setResults] = useState<Array<{ id: number; region: string; temperature: number; salinity: number; depth: number }> | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -107,9 +107,10 @@ export default function Dashboard() {
 
       setResults(mockResults);
       setSuccess('Query executed successfully!');
-    } catch (err: any) {
+    } catch (err: Error | unknown) {
       console.error('Query error:', err);
-      setError(err.message || 'Failed to execute query');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to execute query';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

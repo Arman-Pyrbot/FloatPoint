@@ -48,12 +48,19 @@ export default function SignIn() {
         // Don't redirect immediately after signup as user needs to verify email
       } else {
         // Sign in with email
-        await signInWithEmail(email, password);
-        router.push('/');
+        const data = await signInWithEmail(email, password);
+        if (data.session) {
+          // Successful authentication, redirect to dashboard directly
+          router.push('/dashboard');
+        } else {
+          // Session not available, redirect to home which will handle auth state
+          router.push('/');
+        }
       }
-    } catch (error: any) {
+    } catch (error: Error | unknown) {
       console.error('Email authentication error:', error);
-      setError(error.message || `Failed to ${isSignUp ? 'sign up' : 'sign in'} with email`);
+      const errorMessage = error instanceof Error ? error.message : `Failed to ${isSignUp ? 'sign up' : 'sign in'} with email`;
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
