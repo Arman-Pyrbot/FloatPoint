@@ -16,18 +16,20 @@ export default function AuthCallback() {
 
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
-          
           if (error) {
             setError(error.message);
             console.error('Auth callback error:', error);
-            // Wait a moment before redirecting on error
             setTimeout(() => router.push('/auth/signin'), 2000);
           } else {
-            // Successful authentication, redirect to dashboard
             router.push('/dashboard');
           }
         } else {
-          // No code found in URL
+          // Check if already authenticated
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            router.push('/dashboard');
+            return;
+          }
           setError('No authentication code found');
           setTimeout(() => router.push('/auth/signin'), 2000);
         }

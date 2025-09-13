@@ -49,8 +49,8 @@ export default function SignIn() {
       } else {
         // Sign in with email
         await signInWithEmail(email, password);
-        // The auth provider will handle the redirection to dashboard
-        // No need to redirect here as Supabase will handle it
+        // After successful sign-in, redirect to dashboard
+        router.push('/dashboard');
       }
     } catch (error: Error | unknown) {
       console.error('Email authentication error:', error);
