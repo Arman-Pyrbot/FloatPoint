@@ -59,11 +59,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error, data } = await supabase.auth.signInWithPassword({
       email,
       password,
+      options: {
+        // No redirectTo here; Supabase does not support it for signInWithPassword
+      },
     });
     if (error) throw error;
-    
-    // Return the session data so the calling component can use it if needed
-    return data;
+    // No return value; just throw on error
   };
 
   const signUpWithEmail = async (email: string, password: string) => {
