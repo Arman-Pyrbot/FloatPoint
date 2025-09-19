@@ -64,7 +64,7 @@ export default function SignIn() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <h1 className="text-2xl font-bold text-center mb-6">Sign In to ArgoAI Chat</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">Sign In to FloatPoint</h1>
         
         {error && (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">

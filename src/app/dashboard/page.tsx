@@ -128,7 +128,7 @@ export default function Dashboard() {
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">ArgoAI Chat Dashboard</h1>
+        <h1 className="text-3xl font-bold">FloatPoint Dashboard</h1>
         <Button variant="outline" onClick={handleSignOut}>
           Sign Out
         </Button>

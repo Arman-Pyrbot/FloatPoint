@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-8">
-      <h1 className="text-4xl font-bold mb-4">ArgoAI Chat</h1>
+      <h1 className="text-4xl font-bold mb-4">FloatPoint</h1>
       <p className="mb-8 text-center max-w-md">An AI-Powered Conversational Interface for Argo Ocean Data</p>
       <div className="animate-pulse">Redirecting...</div>
     </div>

@@ -19,22 +19,37 @@ export default function AuthCallback() {
           if (error) {
             setError(error.message);
             console.error('Auth callback error:', error);
+            // Clear any existing session on error
+            await supabase.auth.signOut();
             setTimeout(() => router.push('/auth/signin'), 2000);
           } else {
             router.push('/dashboard');
           }
         } else {
           // Check if already authenticated
-          const { data: { session } } = await supabase.auth.getSession();
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+          if (sessionError) {
+            console.error('Session error:', sessionError);
+            // Clear invalid session
+            await supabase.auth.signOut();
+            setError('Session expired. Please sign in again.');
+            setTimeout(() => router.push('/auth/signin'), 2000);
+            return;
+          }
+
           if (session) {
             router.push('/dashboard');
             return;
           }
+
           setError('No authentication code found');
           setTimeout(() => router.push('/auth/signin'), 2000);
         }
       } catch (err) {
         console.error('Auth callback exception:', err);
+        // Clear any existing session on exception
+        await supabase.auth.signOut();
         setError('Authentication process failed');
         setTimeout(() => router.push('/auth/signin'), 2000);
       }
@@ -47,7 +62,7 @@ export default function AuthCallback() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 text-center">
         <h1 className="text-2xl font-bold mb-4">Authentication</h1>
-        
+
         {error ? (
           <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
             {error}
