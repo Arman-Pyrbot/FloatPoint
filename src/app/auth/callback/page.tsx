@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth-provider';
 import VantaBackground from '@/components/VantaBackground';
+import supabase from '@/lib/supabaseClient';
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -11,25 +12,90 @@ export default function AuthCallback() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Let Supabase handle the callback automatically through the auth provider
     const handleCallback = async () => {
-      // Wait a moment for auth state to update
-      setTimeout(() => {
-        if (!isLoading) {
-          if (user) {
-            // User is authenticated, redirect to dashboard
+      console.log('=== CALLBACK DEBUG ===');
+      console.log('Current URL:', window.location.href);
+      console.log('Hash:', window.location.hash);
+      console.log('Search params:', window.location.search);
+
+      try {
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        
+        console.log('URL params:', Object.fromEntries(urlParams));
+        console.log('Hash params:', Object.fromEntries(hashParams));
+
+        // Check for access token in hash (email verification)
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
+
+        if (accessToken && refreshToken) {
+          console.log('Found tokens in hash, setting session...');
+          
+          // Set the session manually
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+
+          if (error) {
+            console.error('Error setting session:', error);
+            setError('Email verification failed: ' + error.message);
+            setTimeout(() => router.push('/auth/signin'), 2000);
+          } else if (data.session) {
+            console.log('Session set successfully:', data.session.user.email);
             router.replace('/dashboard');
           } else {
-            // No user found after callback processing
-            setError('Authentication failed. Please try again.');
+            console.log('No session created');
+            setError('Email verification failed. Please try again.');
             setTimeout(() => router.push('/auth/signin'), 2000);
           }
+          return;
         }
-      }, 2000);
+
+        // Handle other callback types (OAuth, etc.)
+        const code = urlParams.get('code');
+        if (code) {
+          console.log('Found OAuth code, exchanging...');
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) {
+            console.error('OAuth error:', error);
+            setError('Authentication failed: ' + error.message);
+            setTimeout(() => router.push('/auth/signin'), 2000);
+          } else {
+            console.log('OAuth successful');
+            router.replace('/dashboard');
+          }
+          return;
+        }
+
+        // Fallback: wait for auth state to update
+        console.log('No direct tokens found, waiting for auth state...');
+        setTimeout(() => {
+          console.log('After timeout - User:', !!user, 'IsLoading:', isLoading);
+          if (!isLoading) {
+            if (user) {
+              console.log('User authenticated via auth state, redirecting');
+              router.replace('/dashboard');
+            } else {
+              console.log('No user found after waiting');
+              setError('Authentication failed. Please try again.');
+              setTimeout(() => router.push('/auth/signin'), 2000);
+            }
+          }
+        }, 2000);
+
+      } catch (err) {
+        console.error('Callback error:', err);
+        setError('Authentication process failed');
+        setTimeout(() => router.push('/auth/signin'), 2000);
+      }
     };
 
     handleCallback();
-  }, [user, isLoading, router]);
+  }, [router]); // Removed user and isLoading dependencies to prevent re-runs
 
   // Show loading while processing
   if (isLoading || (!error && !user)) {
