@@ -49,10 +49,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (provider: 'google' | 'github') => {
+    const redirectUrl = `${window.location.origin}/auth/callback`;
+    console.log('OAuth redirect URL:', redirectUrl);
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: redirectUrl
       }
     });
     if (error) throw error;
@@ -74,11 +77,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUpWithEmail = async (email: string, password: string, firstName?: string, lastName?: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -88,6 +90,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     
     if (error) throw error;
+    
+    console.log('Signup response:', data);
+    return data;
   };
 
   const signOut = async () => {
@@ -95,11 +100,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const resendConfirmation = async (email: string) => {
+    const redirectUrl = `${window.location.origin}/auth/callback`;
+    console.log('Resend confirmation redirect URL:', redirectUrl);
+    
     const { error } = await supabase.auth.resend({
       type: 'signup',
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`
+        emailRedirectTo: redirectUrl
       }
     });
     if (error) throw error;

@@ -18,74 +18,86 @@ export default function AuthCallback() {
       console.log('Hash:', window.location.hash);
       console.log('Search params:', window.location.search);
 
-      try {
-        // Get URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      // Parse URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      
+      console.log('URL params:', Object.fromEntries(urlParams));
+      console.log('Hash params:', Object.fromEntries(hashParams));
+
+      // Check for error in hash (from Supabase redirect)
+      const hashError = hashParams.get('error');
+      const hashErrorCode = hashParams.get('error_code');
+      const hashErrorDescription = hashParams.get('error_description');
+
+      if (hashError) {
+        console.log('Hash error detected:', hashError, hashErrorCode, hashErrorDescription);
         
-        console.log('URL params:', Object.fromEntries(urlParams));
-        console.log('Hash params:', Object.fromEntries(hashParams));
+        // The token is expired on Supabase's side, which means there's a configuration issue
+        if (hashErrorCode === 'otp_expired') {
+          setError('Email verification failed. This might be a configuration issue. Please try signing up again or contact support.');
+        } else {
+          setError(hashErrorDescription || 'Email verification failed');
+        }
+        
+        setTimeout(() => router.push('/auth/signin'), 3000);
+        return;
+      }
 
-        // Check for access token in hash (email verification)
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-        const type = hashParams.get('type');
-
-        if (accessToken && refreshToken) {
-          console.log('Found tokens in hash, setting session...');
-          
-          // Set the session manually
-          const { data, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken
+      // Check for successful verification parameters
+      const tokenHash = urlParams.get('token_hash');
+      const type = urlParams.get('type');
+      
+      if (tokenHash && type) {
+        console.log('Found token_hash and type, attempting verification...');
+        
+        try {
+          const { data, error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: type as 'signup' | 'recovery' | 'invite' | 'email_change'
           });
 
           if (error) {
-            console.error('Error setting session:', error);
+            console.error('OTP verification error:', error);
             setError('Email verification failed: ' + error.message);
             setTimeout(() => router.push('/auth/signin'), 2000);
           } else if (data.session) {
-            console.log('Session set successfully:', data.session.user.email);
+            console.log('Email verification successful!');
             router.replace('/dashboard');
           } else {
-            console.log('No session created');
-            setError('Email verification failed. Please try again.');
+            console.log('Verification succeeded but no session created');
+            setError('Email verified but login failed. Please try signing in.');
             setTimeout(() => router.push('/auth/signin'), 2000);
           }
+        } catch (err) {
+          console.error('Verification error:', err);
+          setError('Email verification failed');
+          setTimeout(() => router.push('/auth/signin'), 2000);
+        }
+        return;
+      }
+
+      // Fallback: check current session
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session error:', error);
+          setError('Authentication failed: ' + error.message);
+          setTimeout(() => router.push('/auth/signin'), 2000);
           return;
         }
 
-        // Handle other callback types (OAuth, etc.)
-        const code = urlParams.get('code');
-        if (code) {
-          console.log('Found OAuth code, exchanging...');
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) {
-            console.error('OAuth error:', error);
-            setError('Authentication failed: ' + error.message);
-            setTimeout(() => router.push('/auth/signin'), 2000);
-          } else {
-            console.log('OAuth successful');
-            router.replace('/dashboard');
-          }
+        if (data.session) {
+          console.log('Session found, redirecting to dashboard');
+          router.replace('/dashboard');
           return;
         }
 
-        // Fallback: wait for auth state to update
-        console.log('No direct tokens found, waiting for auth state...');
-        setTimeout(() => {
-          console.log('After timeout - User:', !!user, 'IsLoading:', isLoading);
-          if (!isLoading) {
-            if (user) {
-              console.log('User authenticated via auth state, redirecting');
-              router.replace('/dashboard');
-            } else {
-              console.log('No user found after waiting');
-              setError('Authentication failed. Please try again.');
-              setTimeout(() => router.push('/auth/signin'), 2000);
-            }
-          }
-        }, 2000);
+        // No session and no verification parameters
+        console.log('No session or verification parameters found');
+        setError('Authentication failed. Please try again.');
+        setTimeout(() => router.push('/auth/signin'), 2000);
 
       } catch (err) {
         console.error('Callback error:', err);
@@ -95,7 +107,7 @@ export default function AuthCallback() {
     };
 
     handleCallback();
-  }, [router]); // Removed user and isLoading dependencies to prevent re-runs
+  }, [router]);
 
   // Show loading while processing
   if (isLoading || (!error && !user)) {
