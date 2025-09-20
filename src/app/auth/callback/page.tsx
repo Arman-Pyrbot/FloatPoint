@@ -12,10 +12,36 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { searchParams } = new URL(window.location.href);
-        const code = searchParams.get('code');
-        const error_code = searchParams.get('error');
-        const error_description = searchParams.get('error_description');
+        const url = new URL(window.location.href);
+        const urlHash = window.location.hash;
+        
+        console.log('Full URL:', window.location.href);
+        console.log('Hash:', urlHash);
+        console.log('Search params:', url.searchParams.toString());
+
+        // Handle hash-based parameters (common in email verification)
+        if (urlHash) {
+          const hashParams = new URLSearchParams(urlHash.substring(1));
+          const accessToken = hashParams.get('access_token');
+          const refreshToken = hashParams.get('refresh_token');
+          const type = hashParams.get('type');
+          
+          console.log('Hash params:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+          
+          if (accessToken && type === 'signup') {
+            console.log('Processing email verification from hash...');
+            // The session should be automatically set by Supabase
+            setTimeout(() => {
+              router.replace('/dashboard');
+            }, 1000);
+            return;
+          }
+        }
+
+        // Handle URL search parameters (OAuth and some email flows)
+        const code = url.searchParams.get('code');
+        const error_code = url.searchParams.get('error');
+        const error_description = url.searchParams.get('error_description');
 
         // Handle OAuth errors
         if (error_code) {
@@ -25,43 +51,45 @@ export default function AuthCallback() {
           return;
         }
 
+        // Handle OAuth code exchange
         if (code) {
+          console.log('Processing OAuth code...');
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) {
             setError(error.message);
             console.error('Auth callback error:', error);
-            // Clear any existing session on error
             await supabase.auth.signOut();
             setTimeout(() => router.push('/auth/signin'), 3000);
           } else {
-            // Successfully authenticated, redirect to dashboard
+            console.log('OAuth authentication successful');
             router.replace('/dashboard');
           }
-        } else {
-          // Check if already authenticated
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-          if (sessionError) {
-            console.error('Session error:', sessionError);
-            // Clear invalid session
-            await supabase.auth.signOut();
-            setError('Session expired. Please sign in again.');
-            setTimeout(() => router.push('/auth/signin'), 3000);
-            return;
-          }
-
-          if (session) {
-            router.replace('/dashboard');
-            return;
-          }
-
-          setError('No authentication code found');
-          setTimeout(() => router.push('/auth/signin'), 3000);
+          return;
         }
+
+        // Check current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          setError('Session error. Please try again.');
+          setTimeout(() => router.push('/auth/signin'), 3000);
+          return;
+        }
+
+        if (session) {
+          console.log('Session found, redirecting to dashboard');
+          router.replace('/dashboard');
+          return;
+        }
+
+        // If we get here, no valid auth parameters were found
+        console.log('No valid authentication parameters found');
+        setError('Invalid authentication link. Please try signing in again.');
+        setTimeout(() => router.push('/auth/signin'), 3000);
+
       } catch (err) {
         console.error('Auth callback exception:', err);
-        // Clear any existing session on exception
-        await supabase.auth.signOut();
         setError('Authentication process failed');
         setTimeout(() => router.push('/auth/signin'), 3000);
       }
