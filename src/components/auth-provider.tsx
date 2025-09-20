@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (provider: 'google' | 'github') => {
     const redirectUrl = `${window.location.origin}/auth/callback`;
     console.log('OAuth redirect URL:', redirectUrl);
-    
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password,
     });
-    
+
     if (error) {
       // Check if it's an email not confirmed error
       if (error.message.includes('Email not confirmed')) {
@@ -80,6 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -87,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       },
     });
-    
+
     if (error) throw error;
   };
 
@@ -98,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const resendConfirmation = async (email: string) => {
     const redirectUrl = `${window.location.origin}/auth/callback`;
     console.log('Resend confirmation redirect URL:', redirectUrl);
-    
+
     const { error } = await supabase.auth.resend({
       type: 'signup',
       email,
