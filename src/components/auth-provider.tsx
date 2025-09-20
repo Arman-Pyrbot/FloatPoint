@@ -37,6 +37,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state change:', event, session?.user?.email);
+        
+        // Handle different auth events
+        if (event === 'SIGNED_IN') {
+          console.log('User signed in:', session?.user?.email);
+        } else if (event === 'SIGNED_OUT') {
+          console.log('User signed out');
+        } else if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed');
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         setIsLoading(false);
@@ -77,10 +87,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUpWithEmail = async (email: string, password: string, firstName?: string, lastName?: string) => {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -90,9 +101,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     
     if (error) throw error;
-    
-    console.log('Signup response:', data);
-    return data;
   };
 
   const signOut = async () => {
