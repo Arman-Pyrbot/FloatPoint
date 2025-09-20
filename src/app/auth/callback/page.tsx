@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import supabase from '@/lib/supabaseClient';
+import VantaBackground from '@/components/VantaBackground';
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -59,22 +60,47 @@ export default function AuthCallback() {
   }, [router]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 text-center">
-        <h1 className="text-2xl font-bold mb-4">Authentication</h1>
+    <>
+      <VantaBackground />
+
+      <div className="auth-container">
+        <h1><strong>Authentication</strong></h1>
 
         {error ? (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div style={{
+            marginBottom: '15px',
+            padding: '10px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            color: '#fca5a5',
+            fontSize: '0.9rem'
+          }}>
             {error}
-            <p className="mt-2 text-sm">Redirecting to sign-in page...</p>
+            <p style={{ marginTop: '8px', fontSize: '0.8rem' }}>Redirecting to sign-in page...</p>
           </div>
         ) : (
           <div>
-            <p className="text-lg mb-4">Processing authentication...</p>
-            <div className="w-8 h-8 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin mx-auto"></div>
+            <p style={{ fontSize: '1.1rem', marginBottom: '20px', color: 'white' }}>Processing authentication...</p>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              border: '2px solid transparent',
+              borderTop: '2px solid #38bdf8',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto'
+            }}></div>
           </div>
         )}
       </div>
-    </div>
+
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </>
   );
 }
