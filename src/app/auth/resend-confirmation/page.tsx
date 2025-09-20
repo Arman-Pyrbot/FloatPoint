@@ -1,34 +1,33 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth-provider';
 import VantaBackground from '@/components/VantaBackground';
 
-export default function SignInEmail() {
-  const router = useRouter();
-  const { signInWithEmail } = useAuth();
+export default function ResendConfirmation() {
+  const { resendConfirmation } = useAuth();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleEmailSignIn = async (e: React.FormEvent) => {
+  const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     
-    if (!email || !password) {
-      setError('Please enter both email and password');
+    if (!email) {
+      setError('Please enter your email address');
       return;
     }
     
     try {
       setIsLoading(true);
-      await signInWithEmail(email, password);
-      router.push('/dashboard');
+      await resendConfirmation(email);
+      setSuccess('Confirmation email sent! Please check your inbox and click the verification link.');
     } catch (error: Error | unknown) {
-      console.error('Email sign in error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in with email';
+      console.error('Resend confirmation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to resend confirmation email';
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -40,7 +39,7 @@ export default function SignInEmail() {
       <VantaBackground />
       
       <div className="auth-container">
-        <h1><strong>Sign in with Email</strong></h1>
+        <h1><strong>Resend Confirmation</strong></h1>
         
         {error && (
           <div style={{ 
@@ -56,37 +55,37 @@ export default function SignInEmail() {
           </div>
         )}
         
-        <form onSubmit={handleEmailSignIn}>
+        {success && (
+          <div style={{ 
+            marginBottom: '15px', 
+            padding: '10px', 
+            background: 'rgba(34, 197, 94, 0.1)', 
+            border: '1px solid rgba(34, 197, 94, 0.3)', 
+            borderRadius: '8px', 
+            color: '#86efac',
+            fontSize: '0.9rem'
+          }}>
+            {success}
+          </div>
+        )}
+        
+        <form onSubmit={handleResend}>
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Enter your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}
             required
           />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
-            required
-          />
           <button type="submit" className="auth-btn" disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? 'Sending...' : 'Resend Confirmation Email'}
           </button>
         </form>
 
         <p className="switch">
-          Don&apos;t have an account? <a href="/auth/signup-email">Sign up</a>
+          Remember your password? <a href="/auth/signin-email">Sign in</a>
         </p>
-        
-        {error && error.includes('confirmation link') && (
-          <p className="switch">
-            <a href="/auth/resend-confirmation">Resend confirmation email</a>
-          </p>
-        )}
       </div>
     </>
   );
