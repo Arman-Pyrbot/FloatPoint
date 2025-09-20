@@ -14,6 +14,16 @@ export default function AuthCallback() {
       try {
         const { searchParams } = new URL(window.location.href);
         const code = searchParams.get('code');
+        const error_code = searchParams.get('error');
+        const error_description = searchParams.get('error_description');
+
+        // Handle OAuth errors
+        if (error_code) {
+          setError(error_description || 'Authentication failed');
+          console.error('OAuth error:', error_code, error_description);
+          setTimeout(() => router.push('/auth/signin'), 3000);
+          return;
+        }
 
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -22,9 +32,10 @@ export default function AuthCallback() {
             console.error('Auth callback error:', error);
             // Clear any existing session on error
             await supabase.auth.signOut();
-            setTimeout(() => router.push('/auth/signin'), 2000);
+            setTimeout(() => router.push('/auth/signin'), 3000);
           } else {
-            router.push('/dashboard');
+            // Successfully authenticated, redirect to dashboard
+            router.replace('/dashboard');
           }
         } else {
           // Check if already authenticated
@@ -35,24 +46,24 @@ export default function AuthCallback() {
             // Clear invalid session
             await supabase.auth.signOut();
             setError('Session expired. Please sign in again.');
-            setTimeout(() => router.push('/auth/signin'), 2000);
+            setTimeout(() => router.push('/auth/signin'), 3000);
             return;
           }
 
           if (session) {
-            router.push('/dashboard');
+            router.replace('/dashboard');
             return;
           }
 
           setError('No authentication code found');
-          setTimeout(() => router.push('/auth/signin'), 2000);
+          setTimeout(() => router.push('/auth/signin'), 3000);
         }
       } catch (err) {
         console.error('Auth callback exception:', err);
         // Clear any existing session on exception
         await supabase.auth.signOut();
         setError('Authentication process failed');
-        setTimeout(() => router.push('/auth/signin'), 2000);
+        setTimeout(() => router.push('/auth/signin'), 3000);
       }
     };
 

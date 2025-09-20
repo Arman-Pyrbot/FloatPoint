@@ -26,7 +26,7 @@ export default function SignUpEmail() {
     
     try {
       setIsLoading(true);
-      await signUpWithEmail(email, password);
+      await signUpWithEmail(email, password, firstName, lastName);
       setSuccess('Sign-up successful! Please check your email for verification.');
     } catch (error: Error | unknown) {
       console.error('Email sign up error:', error);

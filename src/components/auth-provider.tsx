@@ -10,7 +10,7 @@ type AuthContextType = {
   isLoading: boolean;
   signIn: (provider: 'google' | 'github') => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
-  signUpWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, firstName?: string, lastName?: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -47,9 +47,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (provider: 'google' | 'github') => {
-    await supabase.auth.signInWithOAuth({
-      provider
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
     });
+    if (error) throw error;
   };
 
   const signInWithEmail = async (email: string, password: string) => {
@@ -64,12 +68,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // No return value; just throw on error
   };
 
-  const signUpWithEmail = async (email: string, password: string) => {
+  const signUpWithEmail = async (email: string, password: string, firstName?: string, lastName?: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          full_name: firstName && lastName ? `${firstName} ${lastName}` : undefined
+        }
       },
     });
     if (error) throw error;
