@@ -8,105 +8,82 @@ import VantaBackground from '@/components/VantaBackground';
 export default function AuthCallback() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
-    const handleAuthCallback = async () => {
+    const finalizeSignup = async () => {
       try {
-        // Handle OAuth code (for social logins)
-        const { searchParams } = new URL(window.location.href);
-        const code = searchParams.get('code');
+        console.log('Processing email verification callback...');
 
-        if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) {
-            setError(error.message);
-            console.error('Auth callback error:', error);
-            setTimeout(() => router.push('/auth/signin'), 2000);
-          } else {
-            router.push('/dashboard');
-          }
-          return;
-        }
+        // Handle email verification callback - modern Supabase approach
+        const { data, error } = await supabase.auth.getSession();
 
-        // Handle email verification result (comes in URL hash)
-        const hashFragment = window.location.hash.substring(1);
-        const hashParams = new URLSearchParams(hashFragment);
-        
-        const accessToken = hashParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token');
-        const errorParam = hashParams.get('error');
-        const errorDescription = hashParams.get('error_description');
-
-        // Handle successful email verification
-        if (accessToken && refreshToken) {
-          const { error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken
-          });
-          
-          if (error) {
-            setError('Failed to set session: ' + error.message);
-            setTimeout(() => router.push('/auth/signin'), 2000);
-          } else {
-            router.push('/dashboard');
-          }
-          return;
-        }
-
-        // Handle email verification errors
-        if (errorParam) {
-          setError(errorDescription || 'Email verification failed');
-          setTimeout(() => router.push('/auth/signin'), 2000);
-          return;
-        }
-
-        // Fallback: check if already authenticated
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
+        if (error) {
+          console.error('Error getting session:', error.message);
+          setError(error.message);
+          setIsProcessing(false);
+          setTimeout(() => router.push('/auth/signin'), 3000);
+        } else if (data.session) {
+          console.log('User session found, redirecting to dashboard:', data.session.user.email);
           router.push('/dashboard');
-          return;
+        } else {
+          // No session found - this is normal for email verification callbacks
+          // The auth state change listener in the auth provider will handle the session update
+          console.log('No session found yet, waiting for auth state update...');
+
+          // Wait a bit for the auth state to update
+          setTimeout(async () => {
+            const { data: retrySession } = await supabase.auth.getSession();
+            if (retrySession.session) {
+              console.log('Session found on retry, redirecting to dashboard');
+              router.push('/dashboard');
+            } else {
+              console.log('Still no session after retry, redirecting to signin');
+              setError('Email verification may have failed. Please try signing in.');
+              setIsProcessing(false);
+              setTimeout(() => router.push('/auth/signin'), 2000);
+            }
+          }, 2000);
         }
-
-        // No valid parameters found
-        setError('No authentication data found');
-        setTimeout(() => router.push('/auth/signin'), 2000);
-
       } catch (err) {
-        console.error('Auth callback exception:', err);
+        console.error('Callback processing error:', err);
         setError('Authentication process failed');
-        setTimeout(() => router.push('/auth/signin'), 2000);
+        setIsProcessing(false);
+        setTimeout(() => router.push('/auth/signin'), 3000);
       }
     };
 
-    handleAuthCallback();
+    finalizeSignup();
   }, [router]);
 
   return (
     <>
       <VantaBackground />
-      
+
       <div className="auth-container">
-        <h1><strong>Authentication</strong></h1>
+        <h1><strong>Verifying Account</strong></h1>
 
         {error ? (
-          <div style={{ 
-            marginBottom: '15px', 
-            padding: '10px', 
-            background: 'rgba(239, 68, 68, 0.1)', 
-            border: '1px solid rgba(239, 68, 68, 0.3)', 
-            borderRadius: '8px', 
+          <div style={{
+            marginBottom: '15px',
+            padding: '10px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
             color: '#fca5a5',
             fontSize: '0.9rem'
           }}>
             {error}
             <p style={{ marginTop: '8px', fontSize: '0.8rem' }}>Redirecting to sign-in page...</p>
           </div>
-        ) : (
+        ) : isProcessing ? (
           <div>
-            <p style={{ fontSize: '1.1rem', marginBottom: '20px', color: 'white' }}>Processing authentication...</p>
-            <div style={{ 
-              width: '32px', 
-              height: '32px', 
+            <p style={{ fontSize: '1.1rem', marginBottom: '20px', color: 'white' }}>
+              Verifying your account...
+            </p>
+            <div style={{
+              width: '32px',
+              height: '32px',
               border: '2px solid transparent',
               borderTop: '2px solid #38bdf8',
               borderRadius: '50%',
@@ -114,7 +91,7 @@ export default function AuthCallback() {
               margin: '0 auto'
             }}></div>
           </div>
-        )}
+        ) : null}
       </div>
 
       <style jsx>{`
