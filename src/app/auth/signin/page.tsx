@@ -7,10 +7,7 @@ import VantaBackground from '@/components/VantaBackground';
 
 export default function SignIn() {
   const router = useRouter();
-  const { signIn, signInWithEmail } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isEmailMode, setIsEmailMode] = useState(false);
+  const { signIn } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,110 +23,40 @@ export default function SignIn() {
     }
   };
 
-  const handleEmailSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      return;
-    }
-    
-    try {
-      setIsLoading(true);
-      await signInWithEmail(email, password);
-      router.push('/dashboard');
-    } catch (error: Error | unknown) {
-      console.error('Email sign in error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to sign in with email';
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <>
       <VantaBackground />
       
       <div className="auth-container">
-        {isEmailMode ? (
-          <>
-            <h1><strong>Sign in with Email</strong></h1>
-            
-            {error && (
-              <div style={{ 
-                marginBottom: '15px', 
-                padding: '10px', 
-                background: 'rgba(239, 68, 68, 0.1)', 
-                border: '1px solid rgba(239, 68, 68, 0.3)', 
-                borderRadius: '8px', 
-                color: '#fca5a5',
-                fontSize: '0.9rem'
-              }}>
-                {error}
-              </div>
-            )}
-            
-            <form onSubmit={handleEmailSignIn}>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-                required
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
-                required
-              />
-              <button type="submit" className="auth-btn" disabled={isLoading}>
-                {isLoading ? 'Signing in...' : 'Sign In'}
-              </button>
-            </form>
-
-            <p className="switch">
-              Don't have an account? <a href="/auth/signup">Sign up</a>
-            </p>
-          </>
-        ) : (
-          <>
-            <h1><strong>Sign in to <span>Float Point</span></strong></h1>
-            
-            {error && (
-              <div style={{ 
-                marginBottom: '15px', 
-                padding: '10px', 
-                background: 'rgba(239, 68, 68, 0.1)', 
-                border: '1px solid rgba(239, 68, 68, 0.3)', 
-                borderRadius: '8px', 
-                color: '#fca5a5',
-                fontSize: '0.9rem'
-              }}>
-                {error}
-              </div>
-            )}
-            
-            <button className="auth-btn" onClick={() => handleOAuthSignIn('google')} disabled={isLoading}>
-              Sign in with Google
-            </button>
-            <button className="auth-btn" onClick={() => handleOAuthSignIn('github')} disabled={isLoading}>
-              Sign in with GitHub
-            </button>
-            <button className="auth-btn" onClick={() => router.push('/auth/signin-email')} disabled={isLoading}>
-              Sign in with Email
-            </button>
-
-            <p className="switch">
-              Don't have an account? <a href="/auth/signup">Sign up</a>
-            </p>
-          </>
+        <h1><strong>Sign in to <span>Float Point</span></strong></h1>
+        
+        {error && (
+          <div style={{ 
+            marginBottom: '15px', 
+            padding: '10px', 
+            background: 'rgba(239, 68, 68, 0.1)', 
+            border: '1px solid rgba(239, 68, 68, 0.3)', 
+            borderRadius: '8px', 
+            color: '#fca5a5',
+            fontSize: '0.9rem'
+          }}>
+            {error}
+          </div>
         )}
+        
+        <button className="auth-btn" onClick={() => handleOAuthSignIn('google')} disabled={isLoading}>
+          Sign in with Google
+        </button>
+        <button className="auth-btn" onClick={() => handleOAuthSignIn('github')} disabled={isLoading}>
+          Sign in with GitHub
+        </button>
+        <button className="auth-btn" onClick={() => router.push('/auth/signin-email')} disabled={isLoading}>
+          Sign in with Email
+        </button>
+
+        <p className="switch">
+          Don&apos;t have an account? <a href="/auth/signup">Sign up</a>
+        </p>
       </div>
     </>
   );

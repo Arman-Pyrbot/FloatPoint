@@ -47,7 +47,7 @@ export default function Dashboard() {
       // For this demo, we'll just insert the query into the queries table and return mock results
       
       // First, check if the user profile exists and create it if it doesn't
-      const { data: userProfile, error: userProfileError } = await supabase
+      const { data: userProfile } = await supabase
         .from('user_profiles')
         .select('id')
         .eq('id', user?.id)

@@ -79,7 +79,7 @@ export default function SignInEmail() {
         </form>
 
         <p className="switch">
-          Don't have an account? <a href="/auth/signup-email">Sign up</a>
+          Don&apos;t have an account? <a href="/auth/signup-email">Sign up</a>
         </p>
       </div>
     </>

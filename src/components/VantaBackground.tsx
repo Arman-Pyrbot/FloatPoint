@@ -4,7 +4,22 @@ import { useEffect } from 'react';
 
 declare global {
   interface Window {
-    VANTA: any;
+    VANTA: {
+      WAVES: (options: {
+        el: string;
+        mouseControls: boolean;
+        touchControls: boolean;
+        gyroControls: boolean;
+        minHeight: number;
+        minWidth: number;
+        scale: number;
+        scaleMobile: number;
+        shininess: number;
+        waveHeight: number;
+        waveSpeed: number;
+        zoom: number;
+      }) => { destroy: () => void };
+    };
   }
 }
 
@@ -45,8 +60,8 @@ export default function VantaBackground() {
       if (window.VANTA) {
         // Clean up Vanta instance if it exists
         const vantaElement = document.getElementById('vanta-background');
-        if (vantaElement && (vantaElement as any).vantaInstance) {
-          (vantaElement as any).vantaInstance.destroy();
+        if (vantaElement && (vantaElement as HTMLElement & { vantaInstance?: { destroy: () => void } }).vantaInstance) {
+          (vantaElement as HTMLElement & { vantaInstance: { destroy: () => void } }).vantaInstance.destroy();
         }
       }
     };
