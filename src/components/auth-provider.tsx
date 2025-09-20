@@ -32,9 +32,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getInitialSession();
 
-    // Listen for auth changes
+    // Listen for auth changes - this automatically handles email verification callbacks
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setIsLoading(false);
@@ -57,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithEmail = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -69,8 +70,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       throw error;
     }
-    
-    return data;
   };
 
   const signUpWithEmail = async (email: string, password: string, firstName?: string, lastName?: string) => {
@@ -86,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       },
     });
+    
     if (error) throw error;
   };
 
