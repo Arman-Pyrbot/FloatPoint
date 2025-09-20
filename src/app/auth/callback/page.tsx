@@ -15,33 +15,73 @@ export default function AuthCallback() {
         const url = new URL(window.location.href);
         const urlHash = window.location.hash;
         
+        console.log('=== AUTH CALLBACK DEBUG ===');
         console.log('Full URL:', window.location.href);
         console.log('Hash:', urlHash);
         console.log('Search params:', url.searchParams.toString());
+
+        // Get all possible parameters
+        const code = url.searchParams.get('code');
+        const token_hash = url.searchParams.get('token_hash');
+        const type = url.searchParams.get('type');
+        const error_code = url.searchParams.get('error');
+        const error_description = url.searchParams.get('error_description');
+
+        console.log('URL Params:', { code, token_hash, type, error_code, error_description });
 
         // Handle hash-based parameters (common in email verification)
         if (urlHash) {
           const hashParams = new URLSearchParams(urlHash.substring(1));
           const accessToken = hashParams.get('access_token');
           const refreshToken = hashParams.get('refresh_token');
-          const type = hashParams.get('type');
+          const hashType = hashParams.get('type');
           
-          console.log('Hash params:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+          console.log('Hash params:', { 
+            accessToken: accessToken ? 'present' : 'missing', 
+            refreshToken: refreshToken ? 'present' : 'missing', 
+            type: hashType 
+          });
           
-          if (accessToken && type === 'signup') {
+          if (accessToken) {
             console.log('Processing email verification from hash...');
-            // The session should be automatically set by Supabase
-            setTimeout(() => {
-              router.replace('/dashboard');
-            }, 1000);
+            // Wait a moment for Supabase to process the session
+            setTimeout(async () => {
+              const { data: { session }, error } = await supabase.auth.getSession();
+              if (error) {
+                console.error('Session error after hash processing:', error);
+                setError('Email verification failed. Please try again.');
+                setTimeout(() => router.push('/auth/signin'), 3000);
+              } else if (session) {
+                console.log('Email verification successful, session found');
+                router.replace('/dashboard');
+              } else {
+                console.log('No session found after hash processing');
+                setError('Email verification incomplete. Please try signing in.');
+                setTimeout(() => router.push('/auth/signin'), 3000);
+              }
+            }, 2000);
             return;
           }
         }
 
-        // Handle URL search parameters (OAuth and some email flows)
-        const code = url.searchParams.get('code');
-        const error_code = url.searchParams.get('error');
-        const error_description = url.searchParams.get('error_description');
+        // Handle email verification with token_hash (newer Supabase format)
+        if (token_hash && type) {
+          console.log('Processing email verification with token_hash...');
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash,
+            type: type as any
+          });
+          
+          if (error) {
+            console.error('Token hash verification error:', error);
+            setError('Email verification failed: ' + error.message);
+            setTimeout(() => router.push('/auth/signin'), 3000);
+          } else {
+            console.log('Token hash verification successful');
+            router.replace('/dashboard');
+          }
+          return;
+        }
 
         // Handle OAuth errors
         if (error_code) {
@@ -67,7 +107,8 @@ export default function AuthCallback() {
           return;
         }
 
-        // Check current session
+        // Check current session as fallback
+        console.log('Checking current session...');
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
         if (sessionError) {
@@ -85,7 +126,8 @@ export default function AuthCallback() {
 
         // If we get here, no valid auth parameters were found
         console.log('No valid authentication parameters found');
-        setError('Invalid authentication link. Please try signing in again.');
+        console.log('All params checked:', { code, token_hash, type, urlHash, hasSession: !!session });
+        setError('No authentication code found');
         setTimeout(() => router.push('/auth/signin'), 3000);
 
       } catch (err) {

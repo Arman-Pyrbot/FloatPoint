@@ -57,15 +57,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithEmail = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      options: {
-        // No redirectTo here; Supabase does not support it for signInWithPassword
-      },
     });
-    if (error) throw error;
-    // No return value; just throw on error
+    
+    if (error) {
+      // Check if it's an email not confirmed error
+      if (error.message.includes('Email not confirmed')) {
+        throw new Error('Please check your email and click the confirmation link before signing in.');
+      }
+      throw error;
+    }
+    
+    return data;
   };
 
   const signUpWithEmail = async (email: string, password: string, firstName?: string, lastName?: string) => {
