@@ -274,6 +274,8 @@ body, html {
   gap: 15px;
   color: white;
   font-weight: 900;
+  /* Ensure large base size even if child styles fail */
+  font-size: clamp(4rem, 10vw, 12rem);
   opacity: 0;
   animation: fadeInUp 2s forwards;
 }
@@ -295,18 +297,25 @@ body, html {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   /* Make the title large and responsive */
-  font-size: clamp(6rem, 16vw, 14rem);
+  font-size: clamp(6rem, 16vw, 14rem) !important;
+  line-height: 1;
 }
 
 /* Project logo next to title */
 .project-name .logo {
-  height: clamp(7rem, 14vw, 14rem);
-  width: clamp(7rem, 14vw, 14rem);
+  height: clamp(7rem, 14vw, 14rem) !important;
+  width: clamp(7rem, 14vw, 14rem) !important;
   object-fit: contain;
 }
 
+/* Extra explicit class for homepage title if needed */
+.homepage-title {
+  font-size: clamp(8rem, 20vw, 18rem) !important;
+  line-height: 1;
+}
+
 /* Dashboard Layout (from new UI) */
-.container {
+.fp-container {
   display: flex;
   min-height: 100vh;
   width: 100%; /* avoid 100vw to prevent horizontal overflow when scrollbar is present */
@@ -314,7 +323,7 @@ body, html {
 }
 
 /* LEFT PANEL */
-.left-panel {
+.fp-left-panel {
   width: 260px; /* fixed width for consistent proportions */
   background-color: #1E4A78;
   display: flex;
@@ -324,14 +333,14 @@ body, html {
   color: white;
 }
 
-.logo img {
+.fp-logo img {
   width: 140px;
   height: auto;
   margin-bottom: 30px;
 }
 
 /* History section */
-.history {
+.fp-history {
   flex: 1;
   width: 100%;
   overflow-y: auto;
@@ -339,11 +348,11 @@ body, html {
 }
 
 /* Custom scrollbar */
-.history::-webkit-scrollbar { width: 6px; }
-.history::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
-.history::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
+.fp-history::-webkit-scrollbar { width: 6px; }
+.fp-history::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+.fp-history::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
 
-.history h2 {
+.fp-history h2 {
   font-size: 18px;
   margin-bottom: 15px;
   text-align: center;
@@ -352,7 +361,7 @@ body, html {
   text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
-.history ul {
+.fp-history ul {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -361,7 +370,7 @@ body, html {
   gap: 12px;
 }
 
-.history li {
+.fp-history li {
   padding: 12px 15px;
   background: rgba(255,255,255,0.1);
   border-radius: 12px;
@@ -374,14 +383,14 @@ body, html {
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-.history li:hover {
+.fp-history li:hover {
   background: rgba(255,255,255,0.25);
   transform: translateX(5px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 /* RIGHT PANEL */
-.right-panel {
+.fp-right-panel {
   flex: 1; /* fill remaining space */
   display: flex;
   justify-content: center;
@@ -392,17 +401,17 @@ body, html {
   min-width: 0; /* prevent overflow due to flex child */
 }
 
-.right-panel.animate-once { animation: gradientMove 8s ease forwards; }
+.fp-right-panel.animate-once { animation: gradientMove 8s ease forwards; }
 
 /* Content wrapper */
-.content-wrapper {
+.fp-content {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 /* Welcome text */
-.welcome-text {
+.fp-welcome {
   font-size: 64px;
   color: #1E4A78;
   margin-bottom: 40px;
@@ -410,7 +419,7 @@ body, html {
 }
 
 /* Search container */
-.search-container {
+.fp-search {
   display: flex;
   align-items: center;
   width: clamp(420px, 50vw, 820px);
@@ -423,9 +432,9 @@ body, html {
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.search-icon { color: #333; font-size: 20px; margin-right: 16px; }
+.fp-search-icon { color: #333; font-size: 20px; margin-right: 16px; }
 
-.search-input {
+.fp-search-input {
   flex: 1;
   border: none;
   outline: none;
@@ -434,9 +443,9 @@ body, html {
   color: #000;
 }
 
-.search-input::placeholder { color: rgba(0, 0, 0, 0.6); font-size: 18px; }
+.fp-search-input::placeholder { color: rgba(0, 0, 0, 0.6); font-size: 18px; }
 
-.circle-btn {
+.fp-circle-btn {
   width: 70px;
   height: 70px;
   border-radius: 50%;
@@ -450,7 +459,7 @@ body, html {
 }
 
 /* smaller button to match reduced height */
-.search-container .circle-btn { width: 48px; height: 48px; }
+.fp-search .fp-circle-btn { width: 48px; height: 48px; }
 
 .circle-btn:hover { background: rgba(255,255,255,0.5); }
 

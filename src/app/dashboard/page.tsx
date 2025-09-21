@@ -81,13 +81,13 @@ export default function Dashboard() {
         <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
       </div>
 
-      <div className="container">
+      <div className="fp-container">
         {/* Left Panel */}
-        <div className="left-panel">
-          <div className="logo">
+        <div className="fp-left-panel">
+          <div className="fp-logo">
             <Image src="/logo.png" alt="FloatPoint Logo" width={140} height={140} />
           </div>
-          <div className="history">
+          <div className="fp-history">
             <h2>History</h2>
             <ul>
               {history.length === 0 && (
@@ -103,9 +103,9 @@ export default function Dashboard() {
         </div>
 
         {/* Right Panel */}
-        <div className="right-panel animate-once">
-          <div className="content-wrapper">
-            <h1 className="welcome-text">Welcome!</h1>
+        <div className="fp-right-panel animate-once">
+          <div className="fp-content">
+            <h1 className="fp-welcome">Welcome!</h1>
             <NLPQueryForm
               compact
               value={currentQuery}

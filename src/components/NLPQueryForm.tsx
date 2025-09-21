@@ -90,18 +90,18 @@ export default function NLPQueryForm({ compact = false, onSubmitted, value, onCh
   if (compact) {
     return (
       <div className="w-full">
-        <div className="search-container">
-          <i className="search-icon">🔍</i>
+        <div className="fp-search">
+          <i className="fp-search-icon">🔍</i>
           <input
             type="text"
-            className="search-input"
+            className="fp-search-input"
             placeholder="Search..."
             value={controlledValue}
             onChange={(e) => onChange ? onChange(e.target.value) : setQuery(e.target.value)}
             disabled={loading}
           />
           <button
-            className="circle-btn"
+            className="fp-circle-btn"
             onClick={() => handleSubmit()}
             disabled={loading || !controlledValue.trim()}
             aria-label="Submit query"
