@@ -271,11 +271,11 @@ body, html {
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: clamp(1rem, 3vw, 3rem);
   color: white;
   font-weight: 900;
   /* Ensure large base size even if child styles fail */
-  font-size: clamp(4rem, 10vw, 12rem);
+  font-size: clamp(10rem, 25vw, 24rem) !important;
   opacity: 0;
   animation: fadeInUp 2s forwards;
 }
@@ -303,15 +303,17 @@ body, html {
 
 /* Project logo next to title */
 .project-name .logo {
-  height: clamp(7rem, 14vw, 14rem) !important;
-  width: clamp(7rem, 14vw, 14rem) !important;
+  height: clamp(12rem, 28vw, 28rem) !important;
+  width: clamp(12rem, 28vw, 28rem) !important;
   object-fit: contain;
 }
 
 /* Extra explicit class for homepage title if needed */
 .homepage-title {
-  font-size: clamp(8rem, 20vw, 18rem) !important;
-  line-height: 1;
+  font-size: clamp(12rem, 30vw, 28rem) !important;
+  line-height: 0.9 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* Dashboard Layout (from new UI) */
