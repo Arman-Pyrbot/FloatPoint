@@ -295,13 +295,13 @@ body, html {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   /* Make the title large and responsive */
-  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-size: clamp(6rem, 16vw, 14rem);
 }
 
 /* Project logo next to title */
 .project-name .logo {
-  height: clamp(4rem, 8vw, 9rem);
-  width: clamp(4rem, 8vw, 9rem);
+  height: clamp(7rem, 14vw, 14rem);
+  width: clamp(7rem, 14vw, 14rem);
   object-fit: contain;
 }
 
@@ -309,6 +309,8 @@ body, html {
 .container {
   display: flex;
   min-height: 100vh;
+  width: 100%; /* avoid 100vw to prevent horizontal overflow when scrollbar is present */
+  overflow: hidden;
 }
 
 /* LEFT PANEL */
@@ -386,6 +388,8 @@ body, html {
   align-items: center;
   background: linear-gradient(45deg, #E3F8FA, #A9D6E5, #5CA9D6, #89CFF0);
   background-size: 400% 400%;
+  height: 100vh; /* ensure full height */
+  min-width: 0; /* prevent overflow due to flex child */
 }
 
 .right-panel.animate-once { animation: gradientMove 8s ease forwards; }
@@ -399,7 +403,7 @@ body, html {
 
 /* Welcome text */
 .welcome-text {
-  font-size: 48px;
+  font-size: 64px;
   color: #1E4A78;
   margin-bottom: 40px;
   text-align: center;
@@ -409,28 +413,28 @@ body, html {
 .search-container {
   display: flex;
   align-items: center;
-  width: clamp(320px, 60vw, 900px);
-  height: 150px;
+  width: clamp(420px, 50vw, 820px);
+  height: 80px;
   background: rgba(255, 255, 255, 0.25);
-  border-radius: 75px;
+  border-radius: 40px;
   padding: 0 30px;
   backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.search-icon { color: #333; font-size: 28px; margin-right: 20px; }
+.search-icon { color: #333; font-size: 20px; margin-right: 16px; }
 
 .search-input {
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  font-size: 28px;
+  font-size: 18px;
   color: #000;
 }
 
-.search-input::placeholder { color: rgba(0, 0, 0, 0.6); font-size: 28px; }
+.search-input::placeholder { color: rgba(0, 0, 0, 0.6); font-size: 18px; }
 
 .circle-btn {
   width: 70px;
@@ -444,6 +448,9 @@ body, html {
   cursor: pointer;
   transition: 0.3s;
 }
+
+/* smaller button to match reduced height */
+.search-container .circle-btn { width: 48px; height: 48px; }
 
 .circle-btn:hover { background: rgba(255,255,255,0.5); }
 

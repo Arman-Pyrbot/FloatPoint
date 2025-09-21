@@ -13,6 +13,7 @@ export default function Dashboard() {
   const { user, isLoading, signOut } = useAuth();
   const [history, setHistory] = useState<string[]>([]);
   const [currentQuery, setCurrentQuery] = useState('');
+  const [autoSubmitNext, setAutoSubmitNext] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -59,8 +60,9 @@ export default function Dashboard() {
   };
 
   const handleHistoryClick = (q: string) => {
+    setAutoSubmitNext(true);
     setCurrentQuery(q);
-    // NLPQueryForm will auto-submit via autoSubmitOnValueChange
+    // NLPQueryForm will auto-submit once via autoSubmitOnValueChange
   };
 
   // If still loading or not authenticated, show loading state
@@ -108,8 +110,10 @@ export default function Dashboard() {
               compact
               value={currentQuery}
               onChange={setCurrentQuery}
-              autoSubmitOnValueChange
-              onSubmitted={(q) => {
+              autoSubmitOnValueChange={autoSubmitNext}
+              onSubmitted={async (q) => {
+                // Reset so typing doesn't auto-submit
+                setAutoSubmitNext(false);
                 addToHistory(q);
               }}
             />
