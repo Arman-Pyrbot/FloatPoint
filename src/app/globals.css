@@ -294,24 +294,26 @@ body, html {
   background: linear-gradient(90deg, #7cd6fd, #093cbb);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  /* Make the title large and responsive */
+  font-size: clamp(3rem, 8vw, 5.5rem);
 }
 
 /* Project logo next to title */
 .project-name .logo {
-  height: 9rem;
-  width: 9rem;
+  height: clamp(4rem, 8vw, 9rem);
+  width: clamp(4rem, 8vw, 9rem);
   object-fit: contain;
 }
 
 /* Dashboard Layout (from new UI) */
 .container {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 /* LEFT PANEL */
 .left-panel {
-  width: 17%;
+  width: 260px; /* fixed width for consistent proportions */
   background-color: #1E4A78;
   display: flex;
   flex-direction: column;
@@ -378,7 +380,7 @@ body, html {
 
 /* RIGHT PANEL */
 .right-panel {
-  width: 83%;
+  flex: 1; /* fill remaining space */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -407,7 +409,7 @@ body, html {
 .search-container {
   display: flex;
   align-items: center;
-  width: 800px;
+  width: clamp(320px, 60vw, 900px);
   height: 150px;
   background: rgba(255, 255, 255, 0.25);
   border-radius: 75px;
@@ -447,3 +449,14 @@ body, html {
 
 /* Gradient animation */
 @keyframes gradientMove { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+
+/* Response card (glass style) */
+.response-card {
+  margin-top: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  backdrop-filter: blur(6px);
+}

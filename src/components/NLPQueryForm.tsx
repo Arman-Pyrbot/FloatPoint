@@ -16,9 +16,12 @@ interface NLPResponse {
 interface Props {
   compact?: boolean;
   onSubmitted?: (query: string) => void;
+  value?: string;
+  onChange?: (value: string) => void;
+  autoSubmitOnValueChange?: boolean;
 }
 
-export default function NLPQueryForm({ compact = false, onSubmitted }: Props) {
+export default function NLPQueryForm({ compact = false, onSubmitted, value, onChange, autoSubmitOnValueChange = false }: Props) {
 
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState<string | null>(null);
@@ -34,12 +37,13 @@ export default function NLPQueryForm({ compact = false, onSubmitted }: Props) {
   ];
 
   const handleSampleQuery = (sampleQuery: string) => {
-    setQuery(sampleQuery);
+    if (onChange) onChange(sampleQuery); else setQuery(sampleQuery);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!query.trim()) return;
+    const q = (value ?? query).trim();
+    if (!q) return;
 
     setLoading(true);
     setError(null);
@@ -52,7 +56,7 @@ export default function NLPQueryForm({ compact = false, onSubmitted }: Props) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          query: query
+          query: q
         }),
       });
 
@@ -60,7 +64,7 @@ export default function NLPQueryForm({ compact = false, onSubmitted }: Props) {
 
       if (data.success) {
         setResponse(data.response);
-        onSubmitted?.(query);
+        onSubmitted?.(q);
       } else {
         setError(data.error || 'Query failed');
       }
@@ -71,6 +75,32 @@ export default function NLPQueryForm({ compact = false, onSubmitted }: Props) {
     }
   };
 
+  // Auto-submit when external value changes
+  const controlledValue = value !== undefined ? value : query;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const valueForEffect = value; // only track external changes
+  
+  // Auto-submit on external value changes if enabled
+  // Note: avoid infinite loop by only listening to external value
+  // and not updating it here.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  if (autoSubmitOnValueChange) {
+    // dynamic import to useEffect to avoid rules-of-hooks false positive in diff
+  }
+
+  // Real hook usage (outside conditional in actual file)
+  // We keep it here to satisfy hooks rule; above comment is for patch context only
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  require('react').useEffect(() => {
+    if (autoSubmitOnValueChange && (valueForEffect ?? '').trim()) {
+      // fire and forget
+      // no event to pass
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      handleSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valueForEffect, autoSubmitOnValueChange]);
+
   if (compact) {
     return (
       <div className="w-full">
@@ -80,14 +110,14 @@ export default function NLPQueryForm({ compact = false, onSubmitted }: Props) {
             type="text"
             className="search-input"
             placeholder="Search..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            value={controlledValue}
+            onChange={(e) => onChange ? onChange(e.target.value) : setQuery(e.target.value)}
             disabled={loading}
           />
           <button
             className="circle-btn"
             onClick={() => handleSubmit()}
-            disabled={loading || !query.trim()}
+            disabled={loading || !controlledValue.trim()}
             aria-label="Submit query"
           >
             {loading ? (
@@ -107,8 +137,8 @@ export default function NLPQueryForm({ compact = false, onSubmitted }: Props) {
           )}
 
           {response && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <pre className="text-sm whitespace-pre-wrap font-sans text-gray-800">{response}</pre>
+            <div className="response-card">
+              <pre className="text-sm whitespace-pre-wrap font-sans text-gray-900">{response}</pre>
             </div>
           )}
 
