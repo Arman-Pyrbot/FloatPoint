@@ -274,8 +274,6 @@ body, html {
   gap: clamp(1rem, 3vw, 3rem);
   color: white;
   font-weight: 900;
-  /* Ensure large base size even if child styles fail */
-  font-size: clamp(10rem, 25vw, 24rem) !important;
   opacity: 0;
   animation: fadeInUp 2s forwards;
 }
@@ -291,29 +289,28 @@ body, html {
   }
 }
 
-/* Optional: make "Float Point" text color gradient */
-.project-name h1 {
-  background: linear-gradient(90deg, #7cd6fd, #093cbb);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  /* Make the title large and responsive */
-  font-size: clamp(6rem, 16vw, 14rem) !important;
-  line-height: 1;
-}
+/* Keep h1 minimal here to avoid conflicts; real styles on .homepage-title */
+.project-name h1 { margin: 0; line-height: 1; }
 
-/* Project logo next to title */
+/* Project logo next to title - moderate default */
 .project-name .logo {
-  height: clamp(12rem, 28vw, 28rem) !important;
-  width: clamp(12rem, 28vw, 28rem) !important;
+  height: clamp(7rem, 12vw, 13rem) !important;
+  width: clamp(7rem, 12vw, 13rem) !important;
   object-fit: contain;
 }
 
-/* Extra explicit class for homepage title if needed */
+/* Homepage title - single source of truth for size + gradient */
 .homepage-title {
-  font-size: clamp(12rem, 30vw, 28rem) !important;
-  line-height: 0.9 !important;
+  display: inline-block;
   margin: 0 !important;
   padding: 0 !important;
+  line-height: 1 !important;
+  font-size: clamp(6rem, 11vw, 12rem) !important; /* moderate default */
+  background: linear-gradient(90deg, #7cd6fd, #093cbb);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 /* Dashboard Layout (from new UI) */
