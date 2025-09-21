@@ -43,6 +43,7 @@ export default function Home() {
       
       {/* Animated Project Name */}
       <div className="project-name">
+        <img src="/logo.png" alt="Float Point Logo" className="logo" />
         <h1>Float Point</h1>
       </div>
 

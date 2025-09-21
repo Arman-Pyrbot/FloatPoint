@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth-provider";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,6 +17,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Float Point",
   description: "An AI-Powered Conversational Interface for Argo Ocean Data",
+  manifest: "/manifest.json",
+  themeColor: "#183A65",
 };
 
 export default function RootLayout({
@@ -31,6 +34,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );

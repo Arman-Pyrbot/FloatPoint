@@ -34,20 +34,35 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto p-4 max-w-4xl">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">FloatPoint Dashboard</h1>
-        <Button variant="outline" onClick={handleSignOut}>
-          Sign Out
-        </Button>
+      {/* Header actions (sign out) */}
+      <div className="absolute top-4 right-4 z-10">
+        <Button variant="outline" onClick={handleSignOut}>Sign Out</Button>
       </div>
 
+      <div className="container">
+        {/* Left Panel */}
+        <div className="left-panel">
+          <div className="logo">
+            <img src="/logo.png" alt="FloatPoint Logo" />
+          </div>
+          <div className="history">
+            <h2>History</h2>
+            <ul>
+              <li>Search 1</li>
+              <li>Search 2</li>
+              <li>Search 3</li>
+              <li>Search 4</li>
+            </ul>
+          </div>
+        </div>
 
-      {/* NLP Query Section */}
-      <div className="mb-8">
-        <NLPQueryForm />
-      </div>
-
+        {/* Right Panel */}
+        <div className="right-panel animate-once">
+          <div className="content-wrapper">
+            <h1 className="welcome-text">Welcome!</h1>
+            <NLPQueryForm compact onSubmitted={() => { /* TODO: add to history */ }} />
+          </div>
+        </div>
       </div>
     </div>
   );

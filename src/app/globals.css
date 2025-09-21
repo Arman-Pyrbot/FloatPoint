@@ -269,9 +269,10 @@ body, html {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 15px;
   color: white;
-  font-size: 3rem;
   font-weight: 900;
   opacity: 0;
   animation: fadeInUp 2s forwards;
@@ -294,3 +295,155 @@ body, html {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* Project logo next to title */
+.project-name .logo {
+  height: 9rem;
+  width: 9rem;
+  object-fit: contain;
+}
+
+/* Dashboard Layout (from new UI) */
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT PANEL */
+.left-panel {
+  width: 17%;
+  background-color: #1E4A78;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 10px;
+  color: white;
+}
+
+.logo img {
+  width: 140px;
+  height: auto;
+  margin-bottom: 30px;
+}
+
+/* History section */
+.history {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Custom scrollbar */
+.history::-webkit-scrollbar { width: 6px; }
+.history::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+.history::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 3px; }
+
+.history h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  text-align: center;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+.history ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history li {
+  padding: 12px 15px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.history li:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* RIGHT PANEL */
+.right-panel {
+  width: 83%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(45deg, #E3F8FA, #A9D6E5, #5CA9D6, #89CFF0);
+  background-size: 400% 400%;
+}
+
+.right-panel.animate-once { animation: gradientMove 8s ease forwards; }
+
+/* Content wrapper */
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Welcome text */
+.welcome-text {
+  font-size: 48px;
+  color: #1E4A78;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+/* Search container */
+.search-container {
+  display: flex;
+  align-items: center;
+  width: 800px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 75px;
+  padding: 0 30px;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.search-icon { color: #333; font-size: 28px; margin-right: 20px; }
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 28px;
+  color: #000;
+}
+
+.search-input::placeholder { color: rgba(0, 0, 0, 0.6); font-size: 28px; }
+
+.circle-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.3);
+  background: rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.circle-btn:hover { background: rgba(255,255,255,0.5); }
+
+/* Gradient animation */
+@keyframes gradientMove { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }

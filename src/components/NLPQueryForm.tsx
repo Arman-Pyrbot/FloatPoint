@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Loader2, MessageSquare } from 'lucide-react';
+import { Loader2, MessageSquare, Play } from 'lucide-react';
 
 interface NLPResponse {
   success: boolean;
@@ -13,7 +13,13 @@ interface NLPResponse {
   error?: string;
 }
 
-export default function NLPQueryForm() {
+interface Props {
+  compact?: boolean;
+  onSubmitted?: (query: string) => void;
+}
+
+export default function NLPQueryForm({ compact = false, onSubmitted }: Props) {
+
   const [query, setQuery] = useState('');
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,8 +37,8 @@ export default function NLPQueryForm() {
     setQuery(sampleQuery);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!query.trim()) return;
 
     setLoading(true);
@@ -54,6 +60,7 @@ export default function NLPQueryForm() {
 
       if (data.success) {
         setResponse(data.response);
+        onSubmitted?.(query);
       } else {
         setError(data.error || 'Query failed');
       }
@@ -64,8 +71,61 @@ export default function NLPQueryForm() {
     }
   };
 
+  if (compact) {
+    return (
+      <div className="w-full">
+        <div className="search-container">
+          <i className="search-icon">🔍</i>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            disabled={loading}
+          />
+          <button
+            className="circle-btn"
+            onClick={() => handleSubmit()}
+            disabled={loading || !query.trim()}
+            aria-label="Submit query"
+          >
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Play className="h-6 w-6" />
+            )}
+          </button>
+        </div>
+
+        {/* Response Display */}
+        <div className="mt-6">
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+              <p className="text-red-700 text-sm">{error}</p>
+            </div>
+          )}
+
+          {response && (
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <pre className="text-sm whitespace-pre-wrap font-sans text-gray-800">{response}</pre>
+            </div>
+          )}
+
+          {!response && !error && !loading && (
+            <div className="text-center py-8 text-gray-500">
+              <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-50" />
+              <p>Ask a question to get AI-powered oceanographic insights</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
+
       {/* Query Input */}
       <div className="mb-6">
         <form onSubmit={handleSubmit} className="space-y-4">
