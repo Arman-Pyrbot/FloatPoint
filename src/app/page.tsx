@@ -9,12 +9,7 @@ export default function Home() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
 
-  useEffect(() => {
-    // If user is authenticated, redirect to dashboard
-    if (!isLoading && user) {
-      router.push('/dashboard');
-    }
-  }, [user, isLoading, router]);
+  // No automatic redirect - users always see homepage
 
   const handleSignIn = () => {
     router.push('/auth/signin');
@@ -22,6 +17,10 @@ export default function Home() {
 
   const handleSignUp = () => {
     router.push('/auth/signup');
+  };
+
+  const handleDashboard = () => {
+    router.push('/dashboard');
   };
 
   // Show loading or redirect if user is authenticated
@@ -36,10 +35,7 @@ export default function Home() {
     );
   }
 
-  // If user is authenticated, don't show the homepage (will redirect)
-  if (user) {
-    return null;
-  }
+  // Show different buttons based on authentication status
 
   return (
     <>
@@ -52,8 +48,17 @@ export default function Home() {
 
       {/* Bottom Buttons */}
       <div className="index-buttons">
-        <button className="index-btn" onClick={handleSignIn}>Sign in</button>
-        <button className="index-btn" onClick={handleSignUp}>Sign up</button>
+        {user ? (
+          <>
+            <button className="index-btn" onClick={handleDashboard}>Go to Dashboard</button>
+            <button className="index-btn" onClick={handleSignIn}>Switch Account</button>
+          </>
+        ) : (
+          <>
+            <button className="index-btn" onClick={handleSignIn}>Sign in</button>
+            <button className="index-btn" onClick={handleSignUp}>Sign up</button>
+          </>
+        )}
       </div>
     </>
   );
