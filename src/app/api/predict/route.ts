@@ -40,16 +40,6 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Prepare data for the HF model
-    const modelInput = [
-      temperature,
-      salinity, 
-      pressure,
-      dissolvedOxygen || null,
-      nitrate || null,
-      chlorophyll || null
-    ];
-    
     // Call the Hugging Face Space API using gradio client
     const { Client } = await import('@gradio/client');
     const client = await Client.connect(HF_SPACE_URL);
