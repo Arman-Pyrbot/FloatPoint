@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, MessageSquare, Lightbulb } from 'lucide-react';
+import { Loader2, MessageSquare } from 'lucide-react';
 import supabase from '@/lib/supabaseClient';
 
 interface NLPResponse {
@@ -79,111 +78,70 @@ export default function NLPQueryForm() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="max-w-4xl mx-auto">
       {/* Query Input */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-blue-500" />
-            Natural Language Query
-          </CardTitle>
-          <CardDescription>
-            Ask questions about ocean conditions in natural language
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="nlp-query" className="block text-sm font-medium mb-2">
-                Your Question
-              </label>
-              <textarea
-                id="nlp-query"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="e.g., What's the temperature at 15°N 75°E tomorrow?"
-                className="w-full p-3 border rounded-md focus:ring focus:ring-blue-300 min-h-[100px] resize-none"
-                disabled={loading}
-              />
-            </div>
+      <div className="mb-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <textarea
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Ask about ocean conditions... (e.g., What's the temperature at 15°N 75°E tomorrow?)"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[120px] resize-none text-base"
+              disabled={loading}
+            />
+          </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <Lightbulb className="h-4 w-4" />
-                Sample Questions
-              </div>
-              <div className="grid grid-cols-1 gap-2">
-                {sampleQueries.map((sampleQuery, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => handleSampleQuery(sampleQuery)}
-                    className="text-left p-2 text-sm bg-gray-50 hover:bg-gray-100 rounded border transition-colors"
-                    disabled={loading}
-                  >
-                    &ldquo;{sampleQuery}&rdquo;
-                  </button>
-                ))}
-              </div>
+          <div className="flex justify-between items-center">
+            <div className="flex flex-wrap gap-2">
+              {sampleQueries.map((sampleQuery, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => handleSampleQuery(sampleQuery)}
+                  className="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                  disabled={loading}
+                >
+                  {sampleQuery}
+                </button>
+              ))}
             </div>
-
-            <Button type="submit" disabled={loading || !query.trim()} className="w-full">
+            
+            <Button type="submit" disabled={loading || !query.trim()}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing Query...
+                  Processing...
                 </>
               ) : (
-                'Ask Question'
+                'Ask'
               )}
             </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+        </form>
+      </div>
 
       {/* Response Display */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-green-500" />
-            AI Response
-          </CardTitle>
-          <CardDescription>
-            Natural language response from the AI model
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+          <p className="text-red-700 text-sm">{error}</p>
+        </div>
+      )}
 
-          {response && (
-            <div className="space-y-3">
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <pre className="text-sm text-blue-800 whitespace-pre-wrap font-sans">
-                  {response}
-                </pre>
-              </div>
-              
-              <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                <p className="text-gray-600 text-xs">
-                  Response generated using FloatPoint NLP system with spatial-temporal LSTM model.
-                  Powered by natural language processing for oceanographic queries.
-                </p>
-              </div>
-            </div>
-          )}
+      {response && (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <pre className="text-sm whitespace-pre-wrap font-sans text-gray-800">
+            {response}
+          </pre>
+        </div>
+      )}
 
-          {!response && !error && !loading && (
-            <div className="text-center py-8 text-gray-500">
-              <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Ask a question to get AI-powered oceanographic insights</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {!response && !error && !loading && (
+        <div className="text-center py-12 text-gray-500">
+          <MessageSquare className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p>Ask a question to get AI-powered oceanographic insights</p>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import supabase from '@/lib/supabaseClient';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Loader2, Waves, Thermometer, Droplets, Gauge, Beaker, Leaf } from 'lucide-react';
 
@@ -126,19 +125,11 @@ export default function PredictionForm() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Input Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Waves className="h-5 w-5 text-blue-500" />
-            Oceanographic Parameters
-          </CardTitle>
-          <CardDescription>
-            Enter current oceanographic conditions to predict next-step values
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">BGC Parameter Prediction</h3>
+        {/* Input Form */}
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Core Parameters */}
             <div className="space-y-4">
@@ -291,53 +282,43 @@ export default function PredictionForm() {
               )}
             </Button>
           </form>
-        </CardContent>
-      </Card>
+      </div>
 
       {/* Results */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Waves className="h-5 w-5 text-green-500" />
-            Prediction Results
-          </CardTitle>
-          <CardDescription>
-            Next-step oceanographic parameter predictions
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+          <p className="text-red-700 text-sm">{error}</p>
+        </div>
+      )}
 
-          {prediction && (
-            <div className="space-y-3">
-              {Object.entries(prediction).map(([key, value]) => (
-                <div key={key} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                  <span className="font-medium text-sm">{key}</span>
-                  <span className="text-sm text-gray-600">{value}</span>
-                </div>
-              ))}
-              
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-blue-700 text-xs">
-                  Predictions generated using FloatPoint BGC LSTM model trained on Indian Ocean data.
-                  Average accuracy: 67.7% R² score.
-                </p>
+      {prediction && (
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Prediction Results</h4>
+          <div className="space-y-3">
+            {Object.entries(prediction).map(([key, value]) => (
+              <div key={key} className="flex justify-between items-center p-3 bg-white rounded-lg border">
+                <span className="font-medium text-sm">{key}</span>
+                <span className="text-sm text-gray-600">{value}</span>
               </div>
+            ))}
+            
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-blue-700 text-xs">
+                Predictions generated using FloatPoint BGC LSTM model trained on Indian Ocean data.
+                Average accuracy: 67.7% R² score.
+              </p>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
-          {!prediction && !error && !loading && (
-            <div className="text-center py-8 text-gray-500">
-              <Waves className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Enter parameters and click predict to see results</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {!prediction && !error && !loading && (
+        <div className="text-center py-12 text-gray-500">
+          <Waves className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p>Enter parameters and click predict to see results</p>
+        </div>
+      )}
+      </div>
     </div>
   );
 }

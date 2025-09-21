@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { History, Trash2, MessageSquare, MapPin, Clock } from 'lucide-react';
+import { History } from 'lucide-react';
 import supabase from '@/lib/supabaseClient';
 
 interface QueryParams {
@@ -96,14 +96,6 @@ export default function QueryHistory({ onQuerySelect }: QueryHistoryProps) {
     return new Date(dateString).toLocaleString();
   };
 
-  const getQueryTypeIcon = (params: QueryParams) => {
-    if (params?.type === 'nlp_query') {
-      return <MessageSquare className="h-4 w-4 text-blue-500" />;
-    } else if (params?.type === 'spatial_temporal') {
-      return <MapPin className="h-4 w-4 text-green-500" />;
-    }
-    return <MessageSquare className="h-4 w-4 text-gray-500" />;
-  };
 
   const getQueryTypeLabel = (params: QueryParams) => {
     if (params?.type === 'nlp_query') {
@@ -172,24 +164,17 @@ export default function QueryHistory({ onQuerySelect }: QueryHistoryProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <History className="h-5 w-5 text-purple-500" />
-          Query History
-        </CardTitle>
-        <CardDescription>
-          Your recent oceanographic queries and predictions ({queries.length} total)
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-4">
+        <h3 className="text-lg font-medium text-gray-900">Recent Queries ({queries.length})</h3>
+      </div>
+      <div>
         {queries.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No queries yet. Start by asking a question or making a prediction!</p>
+            <p>No queries yet. Start by asking a question!</p>
           </div>
         ) : (
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+          <div className="space-y-2 max-h-96 overflow-y-auto">
             {queries.map((query) => (
               <div
                 key={query.id}
@@ -197,51 +182,37 @@ export default function QueryHistory({ onQuerySelect }: QueryHistoryProps) {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      {getQueryTypeIcon(query.params)}
-                      <span className="text-sm font-medium text-gray-700">
-                        {getQueryTypeLabel(query.params)}
-                      </span>
-                      <span className="text-xs text-gray-500 flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {formatDate(query.created_at)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-800 mb-2 line-clamp-2">
+                    <p className="text-sm text-gray-800 mb-1">
                       {query.query_text}
                     </p>
-                    {query.params?.response && (
-                      <div className="text-xs text-gray-600 bg-white p-2 rounded border">
-                        <strong>Response:</strong> {query.params.response.substring(0, 100)}
-                        {query.params.response.length > 100 && '...'}
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span>{getQueryTypeLabel(query.params)}</span>
+                      <span>•</span>
+                      <span>{formatDate(query.created_at)}</span>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     {onQuerySelect && (
-                      <Button
-                        size="sm"
-                        variant="outline"
+                      <button
                         onClick={() => onQuerySelect(query.query_text)}
+                        className="text-xs px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
                       >
-                        Use Again
-                      </Button>
+                        Use
+                      </button>
                     )}
-                    <Button
-                      size="sm"
-                      variant="outline"
+                    <button
                       onClick={() => deleteQuery(query.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-xs px-2 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors"
                     >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                      Delete
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
