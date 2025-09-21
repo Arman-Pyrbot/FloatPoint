@@ -28,13 +28,13 @@ export default function Dashboard() {
     router.push('/auth/signin');
   };
 
-  // Load history from Supabase when user is available
+  // Load history from Supabase (queries table) when user is available
   useEffect(() => {
     const load = async () => {
       if (!user) return;
       const { data, error } = await supabase
-        .from('history')
-        .select('query')
+        .from('queries')
+        .select('query_text')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(5);
@@ -42,7 +42,7 @@ export default function Dashboard() {
         console.error('Failed to load history:', error);
         return;
       }
-      setHistory((data ?? []).map((r: { query: string }) => r.query));
+      setHistory((data ?? []).map((r: { query_text: string }) => r.query_text));
     };
     load();
   }, [user]);
@@ -50,8 +50,8 @@ export default function Dashboard() {
   const addToHistory = async (q: string) => {
     const trimmed = q.trim();
     if (!trimmed) return;
-    // Insert new row; every run is a new row
-    const { error } = await supabase.from('history').insert({ user_id: user!.id, query: trimmed });
+    // Insert new row into queries; every run is a new row
+    const { error } = await supabase.from('queries').insert({ user_id: user!.id, query_text: trimmed, params: null });
     if (error) {
       console.error('Failed to insert history:', error);
     }
