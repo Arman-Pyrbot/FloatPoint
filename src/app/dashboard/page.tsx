@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/auth-provider';
 import supabase from '@/lib/supabaseClient';
+import PredictionForm from '@/components/PredictionForm';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -137,12 +138,21 @@ export default function Dashboard() {
       <div className="bg-white rounded-lg shadow-md p-6 mb-8 dark:bg-gray-800">
         <h2 className="text-xl font-semibold mb-4">Welcome, {user.email || 'User'}</h2>
         <p className="text-gray-600 dark:text-gray-300">
-          Use the form below to query ocean data and visualize results.
+          Use the AI-powered prediction model to forecast oceanographic parameters or query historical data.
         </p>
       </div>
 
+      {/* BGC Prediction Section */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8 dark:bg-gray-800">
-        <h2 className="text-xl font-semibold mb-4">Query Ocean Data</h2>
+        <h2 className="text-xl font-semibold mb-4">🌊 BGC Parameter Prediction</h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
+          Predict next-step oceanographic and biogeochemical parameters using our LSTM model trained on Indian Ocean data.
+        </p>
+        <PredictionForm />
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8 dark:bg-gray-800">
+        <h2 className="text-xl font-semibold mb-4">📊 Historical Data Query</h2>
         
         <form onSubmit={handleSubmitQuery} className="space-y-4">
           <div>
