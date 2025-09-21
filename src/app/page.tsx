@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth-provider';
 import VantaBackground from '@/components/VantaBackground';
@@ -43,7 +44,7 @@ export default function Home() {
       
       {/* Animated Project Name */}
       <div className="project-name">
-        <img src="/logo.png" alt="Float Point Logo" className="logo" />
+        <Image src="/logo.png" alt="Float Point Logo" className="logo" width={144} height={144} priority />
         <h1>Float Point</h1>
       </div>
 

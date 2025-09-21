@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/auth-provider';
 import NLPQueryForm from '@/components/NLPQueryForm';
@@ -82,7 +83,7 @@ export default function Dashboard() {
         {/* Left Panel */}
         <div className="left-panel">
           <div className="logo">
-            <img src="/logo.png" alt="FloatPoint Logo" />
+            <Image src="/logo.png" alt="FloatPoint Logo" width={140} height={140} />
           </div>
           <div className="history">
             <h2>History</h2>

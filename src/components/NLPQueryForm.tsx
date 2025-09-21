@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, MessageSquare, Play } from 'lucide-react';
 
@@ -77,29 +77,15 @@ export default function NLPQueryForm({ compact = false, onSubmitted, value, onCh
 
   // Auto-submit when external value changes
   const controlledValue = value !== undefined ? value : query;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const valueForEffect = value; // only track external changes
-  
-  // Auto-submit on external value changes if enabled
-  // Note: avoid infinite loop by only listening to external value
-  // and not updating it here.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  if (autoSubmitOnValueChange) {
-    // dynamic import to useEffect to avoid rules-of-hooks false positive in diff
-  }
 
-  // Real hook usage (outside conditional in actual file)
-  // We keep it here to satisfy hooks rule; above comment is for patch context only
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  require('react').useEffect(() => {
-    if (autoSubmitOnValueChange && (valueForEffect ?? '').trim()) {
-      // fire and forget
-      // no event to pass
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleSubmit();
+  useEffect(() => {
+    const v = value ?? '';
+    if (autoSubmitOnValueChange && v.trim()) {
+      void handleSubmit();
     }
+    // We intentionally depend on `value` and the flag so it re-runs on changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [valueForEffect, autoSubmitOnValueChange]);
+  }, [value, autoSubmitOnValueChange]);
 
   if (compact) {
     return (
