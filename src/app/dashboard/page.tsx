@@ -4,9 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/components/auth-provider';
-import PredictionForm from '@/components/PredictionForm';
 import NLPQueryForm from '@/components/NLPQueryForm';
-import QueryHistory from '@/components/QueryHistory';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -48,16 +46,6 @@ export default function Dashboard() {
       {/* NLP Query Section */}
       <div className="mb-8">
         <NLPQueryForm />
-      </div>
-
-      {/* BGC Prediction Section */}
-      <div className="mb-8">
-        <PredictionForm />
-      </div>
-
-      {/* Query History Section */}
-      <div className="mb-8">
-        <QueryHistory />
       </div>
 
       </div>

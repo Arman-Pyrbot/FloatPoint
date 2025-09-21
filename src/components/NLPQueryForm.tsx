@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, MessageSquare } from 'lucide-react';
-import supabase from '@/lib/supabaseClient';
 
 interface NLPResponse {
   success: boolean;
@@ -41,22 +40,10 @@ export default function NLPQueryForm() {
     setResponse(null);
 
     try {
-      // Get the current session token (if available)
-      let authHeaders = {};
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
-          authHeaders = { 'Authorization': `Bearer ${session.access_token}` };
-        }
-      } catch {
-        // Continue without auth if session fails
-      }
-
       const apiResponse = await fetch('/api/predict', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           query: query
