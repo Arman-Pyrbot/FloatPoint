@@ -121,10 +121,10 @@ export default function NLPQueryForm({ compact = false, onSubmitted, value, onCh
               Ask me anything about ocean conditions! Examples:
             </h3>
             <ul className="space-y-2 text-sm text-gray-700">
-              <li>• 'What's the temperature at 15°N 75°E tomorrow?'</li>
-              <li>• 'Show me salinity trends in the Arabian Sea next week'</li>
-              <li>• 'Predict oxygen levels in the Bay of Bengal during monsoon'</li>
-              <li>• 'What are the ocean conditions at 10°N 80°E on January 15th?'</li>
+              <li>• &lsquo;What&#39;s the temperature at 15°N 75°E tomorrow?&rsquo;</li>
+              <li>• &lsquo;Show me salinity trends in the Arabian Sea next week&rsquo;</li>
+              <li>• &lsquo;Predict oxygen levels in the Bay of Bengal during monsoon&rsquo;</li>
+              <li>• &lsquo;What are the ocean conditions at 10°N 80°E on January 15th?&rsquo;</li>
             </ul>
           </aside>
         </div>
