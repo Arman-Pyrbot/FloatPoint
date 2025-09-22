@@ -90,28 +90,43 @@ export default function NLPQueryForm({ compact = false, onSubmitted, value, onCh
   if (compact) {
     return (
       <div className="w-full">
-        <div className="fp-search">
-          <i className="fp-search-icon">🔍</i>
-          <input
-            type="text"
-            className="fp-search-input"
-            placeholder="Search..."
-            value={controlledValue}
-            onChange={(e) => onChange ? onChange(e.target.value) : setQuery(e.target.value)}
-            disabled={loading}
-          />
-          <button
-            className="fp-circle-btn"
-            onClick={() => handleSubmit()}
-            disabled={loading || !controlledValue.trim()}
-            aria-label="Submit query"
-          >
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <Play className="h-6 w-6" />
-            )}
-          </button>
+        <div className="flex items-start justify-center gap-6 flex-wrap lg:flex-nowrap">
+          <div className="fp-search">
+            <i className="fp-search-icon">🔍</i>
+            <input
+              type="text"
+              className="fp-search-input"
+              placeholder="Search..."
+              value={controlledValue}
+              onChange={(e) => onChange ? onChange(e.target.value) : setQuery(e.target.value)}
+              disabled={loading}
+            />
+            <button
+              className="fp-circle-btn"
+              onClick={() => handleSubmit()}
+              disabled={loading || !controlledValue.trim()}
+              aria-label="Submit query"
+            >
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Play className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+
+          {/* Examples Panel (shown next to query box on large screens) */}
+          <aside className="hidden lg:block w-[360px] rounded-2xl bg-white/50 border border-white/70 shadow p-4">
+            <h3 className="font-semibold text-gray-800 mb-2">
+              Ask me anything about ocean conditions! Examples:
+            </h3>
+            <ul className="space-y-2 text-sm text-gray-700">
+              <li>• 'What's the temperature at 15°N 75°E tomorrow?'</li>
+              <li>• 'Show me salinity trends in the Arabian Sea next week'</li>
+              <li>• 'Predict oxygen levels in the Bay of Bengal during monsoon'</li>
+              <li>• 'What are the ocean conditions at 10°N 80°E on January 15th?'</li>
+            </ul>
+          </aside>
         </div>
 
         {/* Response Display */}
