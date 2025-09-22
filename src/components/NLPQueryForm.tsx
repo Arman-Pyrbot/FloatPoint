@@ -40,6 +40,16 @@ export default function NLPQueryForm({ compact = false, onSubmitted, value, onCh
     if (onChange) onChange(sampleQuery); else setQuery(sampleQuery);
   };
 
+  // Remove summary suffixes like "... and 24 more data points"
+  const sanitizeResponse = (text: string) => {
+    try {
+      // Remove variants like "... and 24 more data points" or "… and 24 more data points"
+      return String(text).replace(/\s*(?:…|\.{3})?\s*and\s+\d+\s+more data points\.?/gi, '');
+    } catch {
+      return text;
+    }
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const q = (value ?? query).trim();
@@ -63,7 +73,8 @@ export default function NLPQueryForm({ compact = false, onSubmitted, value, onCh
       const data: NLPResponse = await apiResponse.json();
 
       if (data.success) {
-        setResponse(data.response);
+        const cleaned = sanitizeResponse(data.response);
+        setResponse(cleaned);
         onSubmitted?.(q);
       } else {
         setError(data.error || 'Query failed');
@@ -90,8 +101,9 @@ export default function NLPQueryForm({ compact = false, onSubmitted, value, onCh
   if (compact) {
     return (
       <div className="w-full">
-        <div className="flex items-start justify-center gap-6 flex-wrap lg:flex-nowrap">
-          <div className="fp-search">
+        {/* Use grid so the response stays directly below the input, independent of the examples panel height */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start justify-center">
+          <div className="fp-search lg:col-start-1 lg:row-start-1">
             <i className="fp-search-icon">🔍</i>
             <input
               type="text"
@@ -116,7 +128,7 @@ export default function NLPQueryForm({ compact = false, onSubmitted, value, onCh
           </div>
 
           {/* Examples Panel (shown next to query box on large screens) */}
-          <aside className="hidden lg:block w-[360px] rounded-2xl bg-white/50 border border-white/70 shadow p-4">
+          <aside className="hidden lg:block w-[360px] rounded-2xl bg-white/50 border border-white/70 shadow p-4 lg:col-start-2 lg:row-start-1">
             <h3 className="font-semibold text-gray-800 mb-2">
               Ask me anything about ocean conditions! Examples:
             </h3>
@@ -127,28 +139,28 @@ export default function NLPQueryForm({ compact = false, onSubmitted, value, onCh
               <li>• &lsquo;What are the ocean conditions at 10°N 80°E on January 15th?&rsquo;</li>
             </ul>
           </aside>
-        </div>
 
-        {/* Response Display */}
-        <div className="mt-6">
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
-              <p className="text-red-700 text-sm">{error}</p>
-            </div>
-          )}
+          {/* Response Display - stays under the input on large screens */}
+          <div className="mt-0 lg:col-start-1 lg:row-start-2">
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            )}
 
-          {response && (
-            <div className="response-card">
-              <pre className="text-sm whitespace-pre-wrap font-sans text-gray-900">{response}</pre>
-            </div>
-          )}
+            {response && (
+              <div className="response-card">
+                <pre className="text-sm whitespace-pre-wrap font-sans text-gray-900">{response}</pre>
+              </div>
+            )}
 
-          {!response && !error && !loading && (
-            <div className="text-center py-8 text-gray-500">
-              <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-50" />
-              <p>Ask a question to get AI-powered oceanographic insights</p>
-            </div>
-          )}
+            {!response && !error && !loading && (
+              <div className="text-center py-8 text-gray-500">
+                <MessageSquare className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                <p>Ask a question to get AI-powered oceanographic insights</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
